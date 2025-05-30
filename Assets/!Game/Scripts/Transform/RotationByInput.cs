@@ -6,7 +6,12 @@ using Zenject;
 public class RotationByInput : MonoBehaviour
 {
     #region Fields
-    [Header("Rotation sensivity modifier."), SerializeField, Range(0f, 10f)] private float _rotationSensivity = 1.0f;
+    [field: Header("Horizontal rotation sensivity modifier."), SerializeField, Range(0f, 100f)] public float HorizontalRotationSensivity { get; set; } = 1.0f;
+    [Header("Local axis of the horizontal rotation (camera)."), SerializeField] public Axes _horizontalAxis = Axes.X;
+
+    [field: Header("Vertical rotation sensivity modifier."), SerializeField, Range(0f, 100f)] public float VerticalRotationSensivity { get; set; } = 1.0f;
+    [Header("Local axis of the vertical rotation (this transform)."), SerializeField] public Axes _verticalAxis = Axes.Y;
+
     [Header("Camera horizontal max offset."), SerializeField, Range(0f, 90f)] private float _horizontalRotationLimit = 60f;
 
     private Transform _cameraTransform;
@@ -49,15 +54,21 @@ public class RotationByInput : MonoBehaviour
         if (PointerDelta == Vector2.zero)
             return;
 
-        _rotation.x += PointerDelta.x * _rotationSensivity * Time.fixedDeltaTime;
-        _rotation.y += PointerDelta.y * _rotationSensivity * Time.fixedDeltaTime;
-        _rotation.y = Mathf.Clamp(_rotation.y, -_horizontalRotationLimit, _horizontalRotationLimit);
+        float newVerticalAngle = PointerDelta.x * Time.fixedDeltaTime * VerticalRotationSensivity;
+        _rotation.y += newVerticalAngle;
 
-        var xQuat = Quaternion.AngleAxis(_rotation.x, Vector3.up);
-        var yQuat = Quaternion.AngleAxis(_rotation.y, Vector3.left);
+        float newHorizontalAngle = -PointerDelta.y * Time.fixedDeltaTime * HorizontalRotationSensivity;
+        _rotation.x += newHorizontalAngle;
+        _rotation.x = Mathf.Clamp(_rotation.x, -_horizontalRotationLimit, _horizontalRotationLimit);
 
-        _bodyTransform.localRotation = yQuat;
-        _cameraTransform.localRotation = xQuat;
+        Vector3 verticalRotationAxis = AxesSelector.ReturnVector(_verticalAxis, (onXSelection: Vector3.right, onYSelection: Vector3.up, onZSelection: Vector3.forward));
+        Quaternion verticalRotation = Quaternion.AngleAxis(_rotation.y, verticalRotationAxis);
+
+        Vector3 horizontalRotationAxis = AxesSelector.ReturnVector(_horizontalAxis, (onXSelection: Vector3.right, onYSelection: Vector3.up, onZSelection: Vector3.forward));
+        Quaternion horizontalRotation = Quaternion.AngleAxis(_rotation.x, horizontalRotationAxis);
+
+        _bodyTransform.localRotation = verticalRotation;
+        _cameraTransform.localRotation = horizontalRotation;
     }
 
     private void OnEnable () => Subscribe();
