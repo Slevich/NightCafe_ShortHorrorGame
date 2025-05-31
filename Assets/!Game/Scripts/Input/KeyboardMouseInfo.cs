@@ -24,5 +24,7 @@ public class KeyboardMouseInfo
     public bool AccelerationButtonPressed () => _characterActions.Acceleration.IsInProgress();
 
     public bool ApproximationButtonPressed () => _characterActions.Approximation.IsInProgress();
+
+    public bool CrouchingButtonPressed () => _characterActions.Crouching.IsInProgress();
     #endregion
 }

@@ -27,5 +27,21 @@ public class AnimatorSetter : MonoBehaviour
 
         _animator.SetFloat(_lastParameterName, NewValue);
     }
+
+    public void SetTrigger(string TriggerName)
+    {
+        if (_animator == null)
+            return;
+
+        _animator.SetTrigger(TriggerName);
+    }
+
+    public void ResetTrigger(string TriggerName)
+    {
+        if (_animator == null)
+            return;
+
+        _animator.ResetTrigger(TriggerName);
+    }
     #endregion
 }
