@@ -26,5 +26,6 @@ public class KeyboardMouseInfo
     public bool ApproximationButtonPressed () => _characterActions.Approximation.IsInProgress();
 
     public bool CrouchingButtonPressed () => _characterActions.Crouching.IsInProgress();
+    public bool DropButtonPressed() => _characterActions.Drop.IsInProgress();
     #endregion
 }

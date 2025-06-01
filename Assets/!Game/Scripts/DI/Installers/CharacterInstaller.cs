@@ -7,6 +7,10 @@ public class CharacterInstaller : MonoInstaller
 {
     #region Fields
     [Header("Character input."), SerializeField] private CharacterInputHandler _inputHandler;
+    [Header("Items selector."), SerializeField] private ItemsSelector _itemsSelector;
+    [Header("Items manager."), SerializeField] private ItemsManager _itemsManager;
+    [Header("Items grabber."), SerializeField] private ItemGrabber _grabber;
+    [Header("Rig weight lerper."), SerializeField] private RigWeightLerper _rigWeightLerper;
     #endregion
 
     #region Methods
@@ -16,6 +20,27 @@ public class CharacterInstaller : MonoInstaller
             .Bind<CharacterInputHandler>()
             .FromInstance(this._inputHandler)
             .AsSingle();
+
+        this.Container
+            .Bind<ItemsSelector>()
+            .FromInstance(this._itemsSelector)
+            .AsSingle();
+
+        this.Container
+            .Bind<ItemsManager>()
+            .FromInstance(this._itemsManager)
+            .AsSingle();
+
+        this.Container
+            .Bind<ItemGrabber>()
+            .FromInstance(this._grabber)
+            .AsSingle();
+
+        this.Container
+            .Bind<RigWeightLerper>()
+            .FromInstance(this._rigWeightLerper)
+            .AsSingle();
+
     }
     #endregion
 }

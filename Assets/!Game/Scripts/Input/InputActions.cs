@@ -64,6 +64,15 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
+                    ""name"": ""Crouching"",
+                    ""type"": ""Button"",
+                    ""id"": ""549abcf6-59b2-437d-bfb5-0c5e94fa75b1"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
                     ""name"": ""PointerPosition"",
                     ""type"": ""Value"",
                     ""id"": ""fd8c6956-c36e-4856-8178-cee126d20864"",
@@ -82,9 +91,9 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": true
                 },
                 {
-                    ""name"": ""Crouching"",
+                    ""name"": ""Drop"",
                     ""type"": ""Button"",
-                    ""id"": ""549abcf6-59b2-437d-bfb5-0c5e94fa75b1"",
+                    ""id"": ""587edcdf-b080-4bd2-bc5f-a59732afa39f"",
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": """",
@@ -223,6 +232,17 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""action"": ""Crouching"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""e2ae3c96-bf26-43e2-9735-0bf79c447bff"",
+                    ""path"": ""<Keyboard>/g"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Drop"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         },
@@ -263,9 +283,10 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         m_Character_Interaction = m_Character.FindAction("Interaction", throwIfNotFound: true);
         m_Character_Acceleration = m_Character.FindAction("Acceleration", throwIfNotFound: true);
         m_Character_Approximation = m_Character.FindAction("Approximation", throwIfNotFound: true);
+        m_Character_Crouching = m_Character.FindAction("Crouching", throwIfNotFound: true);
         m_Character_PointerPosition = m_Character.FindAction("PointerPosition", throwIfNotFound: true);
         m_Character_PointerDelta = m_Character.FindAction("PointerDelta", throwIfNotFound: true);
-        m_Character_Crouching = m_Character.FindAction("Crouching", throwIfNotFound: true);
+        m_Character_Drop = m_Character.FindAction("Drop", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_Menu = m_UI.FindAction("Menu", throwIfNotFound: true);
@@ -334,9 +355,10 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
     private readonly InputAction m_Character_Interaction;
     private readonly InputAction m_Character_Acceleration;
     private readonly InputAction m_Character_Approximation;
+    private readonly InputAction m_Character_Crouching;
     private readonly InputAction m_Character_PointerPosition;
     private readonly InputAction m_Character_PointerDelta;
-    private readonly InputAction m_Character_Crouching;
+    private readonly InputAction m_Character_Drop;
     public struct CharacterActions
     {
         private @InputActions m_Wrapper;
@@ -345,9 +367,10 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         public InputAction @Interaction => m_Wrapper.m_Character_Interaction;
         public InputAction @Acceleration => m_Wrapper.m_Character_Acceleration;
         public InputAction @Approximation => m_Wrapper.m_Character_Approximation;
+        public InputAction @Crouching => m_Wrapper.m_Character_Crouching;
         public InputAction @PointerPosition => m_Wrapper.m_Character_PointerPosition;
         public InputAction @PointerDelta => m_Wrapper.m_Character_PointerDelta;
-        public InputAction @Crouching => m_Wrapper.m_Character_Crouching;
+        public InputAction @Drop => m_Wrapper.m_Character_Drop;
         public InputActionMap Get() { return m_Wrapper.m_Character; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -369,15 +392,18 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
             @Approximation.started += instance.OnApproximation;
             @Approximation.performed += instance.OnApproximation;
             @Approximation.canceled += instance.OnApproximation;
+            @Crouching.started += instance.OnCrouching;
+            @Crouching.performed += instance.OnCrouching;
+            @Crouching.canceled += instance.OnCrouching;
             @PointerPosition.started += instance.OnPointerPosition;
             @PointerPosition.performed += instance.OnPointerPosition;
             @PointerPosition.canceled += instance.OnPointerPosition;
             @PointerDelta.started += instance.OnPointerDelta;
             @PointerDelta.performed += instance.OnPointerDelta;
             @PointerDelta.canceled += instance.OnPointerDelta;
-            @Crouching.started += instance.OnCrouching;
-            @Crouching.performed += instance.OnCrouching;
-            @Crouching.canceled += instance.OnCrouching;
+            @Drop.started += instance.OnDrop;
+            @Drop.performed += instance.OnDrop;
+            @Drop.canceled += instance.OnDrop;
         }
 
         private void UnregisterCallbacks(ICharacterActions instance)
@@ -394,15 +420,18 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
             @Approximation.started -= instance.OnApproximation;
             @Approximation.performed -= instance.OnApproximation;
             @Approximation.canceled -= instance.OnApproximation;
+            @Crouching.started -= instance.OnCrouching;
+            @Crouching.performed -= instance.OnCrouching;
+            @Crouching.canceled -= instance.OnCrouching;
             @PointerPosition.started -= instance.OnPointerPosition;
             @PointerPosition.performed -= instance.OnPointerPosition;
             @PointerPosition.canceled -= instance.OnPointerPosition;
             @PointerDelta.started -= instance.OnPointerDelta;
             @PointerDelta.performed -= instance.OnPointerDelta;
             @PointerDelta.canceled -= instance.OnPointerDelta;
-            @Crouching.started -= instance.OnCrouching;
-            @Crouching.performed -= instance.OnCrouching;
-            @Crouching.canceled -= instance.OnCrouching;
+            @Drop.started -= instance.OnDrop;
+            @Drop.performed -= instance.OnDrop;
+            @Drop.canceled -= instance.OnDrop;
         }
 
         public void RemoveCallbacks(ICharacterActions instance)
@@ -472,9 +501,10 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         void OnInteraction(InputAction.CallbackContext context);
         void OnAcceleration(InputAction.CallbackContext context);
         void OnApproximation(InputAction.CallbackContext context);
+        void OnCrouching(InputAction.CallbackContext context);
         void OnPointerPosition(InputAction.CallbackContext context);
         void OnPointerDelta(InputAction.CallbackContext context);
-        void OnCrouching(InputAction.CallbackContext context);
+        void OnDrop(InputAction.CallbackContext context);
     }
     public interface IUIActions
     {

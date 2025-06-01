@@ -15,6 +15,7 @@ public class CharacterInputHandler : MonoBehaviour
     public Action<bool> AccelerationButtonPressCallback { get; set; }
     public Action<bool> ApproximationButtonPressCallback { get; set; }
     public Action<bool> CrouchButtonPressCallback { get; set; }
+    public Action<bool> DropButtonPressCallback { get; set; }
     #endregion
 
     private void Awake ()
@@ -44,5 +45,8 @@ public class CharacterInputHandler : MonoBehaviour
 
         bool crouchButtonPressed = info.CrouchingButtonPressed();
         CrouchButtonPressCallback?.Invoke(crouchButtonPressed);
+
+        bool dropButtonPressed = info.DropButtonPressed();
+        DropButtonPressCallback?.Invoke(dropButtonPressed);
     }
 }

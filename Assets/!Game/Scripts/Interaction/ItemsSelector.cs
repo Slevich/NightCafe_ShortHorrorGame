@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -5,8 +6,9 @@ using UnityEngine;
 public class ItemsSelector : MonoBehaviour
 {
     #region Fields
-    [Header("Current selectable object parent."), SerializeField, ReadOnly] private Transform _selectableObjectParent;
+    [Header("Current selectable object."), SerializeField, ReadOnly] private GameObject _selectableObject;
 
+    public Action<GameObject> OnSelectionCallback { get; set; }
     private ISelectable _currentSelectable = null;
     #endregion
 
@@ -19,6 +21,7 @@ public class ItemsSelector : MonoBehaviour
             {
                 _currentSelectable.Deselect();
                 _currentSelectable = null;
+                _selectableObject = null;
             }
 
             return;
@@ -32,10 +35,13 @@ public class ItemsSelector : MonoBehaviour
                 _currentSelectable.Deselect();
 
             _currentSelectable = selectable;
+            _selectableObject = CurrentCastedObject;
 
             if (_currentSelectable != null)
                 _currentSelectable.Select();
         }
+
+        OnSelectionCallback?.Invoke(_selectableObject);
     }
     #endregion
 }

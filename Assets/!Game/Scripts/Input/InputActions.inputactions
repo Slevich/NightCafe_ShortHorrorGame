@@ -42,6 +42,15 @@
                     "initialStateCheck": false
                 },
                 {
+                    "name": "Crouching",
+                    "type": "Button",
+                    "id": "549abcf6-59b2-437d-bfb5-0c5e94fa75b1",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
                     "name": "PointerPosition",
                     "type": "Value",
                     "id": "fd8c6956-c36e-4856-8178-cee126d20864",
@@ -60,9 +69,9 @@
                     "initialStateCheck": true
                 },
                 {
-                    "name": "Crouching",
+                    "name": "Drop",
                     "type": "Button",
-                    "id": "549abcf6-59b2-437d-bfb5-0c5e94fa75b1",
+                    "id": "587edcdf-b080-4bd2-bc5f-a59732afa39f",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
@@ -199,6 +208,17 @@
                     "processors": "",
                     "groups": "",
                     "action": "Crouching",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "e2ae3c96-bf26-43e2-9735-0bf79c447bff",
+                    "path": "<Keyboard>/g",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Drop",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

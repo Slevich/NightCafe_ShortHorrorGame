@@ -6,4 +6,5 @@ public interface ISelectable
 {
     void Select ();
     void Deselect ();
+    public bool LockToCast { get; set; }
 }

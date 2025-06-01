@@ -4,47 +4,81 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
+using Zenject;
 
 public class ItemsManager : MonoBehaviour
 {
     #region Fields
+    [Header("Currently holding item."), SerializeField, ReadOnly] private GrabbableItem _currentItem;
     [Header("Parent for items."), SerializeField] private Transform _itemsParent;
     [Header("Items preview."), SerializeField] private PreviewItem[] _items;
 
+    private ItemGrabber _grabber;
+    private RigWeightLerper _rigWeightLerper;
+    #endregion
+
+    #region Properties
+    public Transform ItemsParent => _itemsParent;
+    public GrabbableItem CurrentItem => _currentItem;
     #endregion
 
     #region Methods
-    private void Awake ()
+    [Inject]
+    public void Construct(RigWeightLerper Lerper, ItemGrabber Grabber)
     {
-        foreach(PreviewItem item in _items)
+        Debug.Log("Прокинул!");
+        _rigWeightLerper = Lerper;
+        _grabber = Grabber;
+
+        foreach (PreviewItem item in _items)
+        {
             item.DestroyExample();
+            item.SetRigWeightLerper(_rigWeightLerper);
+        }
     }
 
+    private void SetItem(GrabbableItem Item) => _currentItem = Item;
+
+    private void OnEnable ()
+    {
+        if(_grabber != null)
+        {
+            _grabber.OnGrab.AddListener(SetItem);
+            _grabber.OnDrop.AddListener(SetItem);
+        }
+    }
+
+    private void OnDisable ()
+    {
+        foreach (PreviewItem item in _items)
+        {
+            item.DestroyExample();
+        }
+
+        if (_grabber != null)
+        {
+            _grabber.OnGrab.RemoveListener(SetItem);
+            _grabber.OnDrop.RemoveListener(SetItem);
+        }
+    }
     #endregion
 }
-
-public enum Items
-{
-    Test
-}
-
 
 [Serializable, ExecuteInEditMode]
 public class PreviewItem
 {
-    [SerializeField] private Items _itemType = Items.Test;
-    [SerializeField] private GameObject _examplePrefab;
-    [SerializeField] private Vector3 _position;
-    [SerializeField] private Vector3 _rotation;
+    [SerializeField] private GrabbableItemScriptable _item;
 
     [SerializeField, HideInInspector] private GameObject _example;
     [SerializeField, HideInInspector] private Transform _parent;
-    [SerializeField, HideInInspector] private bool _expanded = false;
+    [SerializeField, HideInInspector] private RigWeightLerper _rigWeightLerper;
 
     public bool HasExample => _example != null;
     public GameObject Example => _example;
 
     public void SetParent(Transform Parent) => _parent = Parent;
+
+    public void SetRigWeightLerper(RigWeightLerper lerper) => _rigWeightLerper = lerper;
 
     public void DestroyExample()
     {
@@ -57,12 +91,13 @@ public class PreviewItem
 
     public GameObject SpawnExample ()
     {
-        if(_examplePrefab != null && _parent != null && _example == null)
+        if(_item != null && _parent != null && _example == null)
         {
-            GameObject example = MonoBehaviour.Instantiate(_examplePrefab, _parent);
-            example.transform.localPosition = _position;
-            Quaternion rotation = Quaternion.Euler(_rotation);
+            GameObject example = MonoBehaviour.Instantiate(_item.Prefab, _parent);
+            example.transform.localPosition = _item.PositionInHolder;
+            Quaternion rotation = Quaternion.Euler(_item.RotationInHolder);
             example.transform.localRotation = rotation;
+            _rigWeightLerper.SetWeights(1);
             return example;
         }
 
@@ -71,10 +106,11 @@ public class PreviewItem
 
     public void UpdatePositionAndRotation()
     {
-        if(_example != null)
+        if(_item != null)
         {
-            _position = _example.transform.localPosition;
-            _rotation = _example.transform.localRotation.eulerAngles;
+            _item.PositionInHolder = _example.transform.localPosition;
+            _item.RotationInHolder = _example.transform.localRotation.eulerAngles;
+            _rigWeightLerper.SetWeights(0);
         }
     }
 }
@@ -86,41 +122,22 @@ public class PreviewItemDrawer : PropertyDrawer
     public override void OnGUI (Rect position, SerializedProperty property, GUIContent label)
     {
         PreviewItem item = (PreviewItem)property.boxedValue;
-        SerializedProperty prefabPropertry = property.FindPropertyRelative("_examplePrefab");
-        UnityEngine.Object prefab = prefabPropertry.objectReferenceValue;
-        SerializedProperty itemTypeProperty = property.FindPropertyRelative("_itemType");
+        SerializedProperty itemProperty = property.FindPropertyRelative("_item");
+        EditorGUILayout.PropertyField(itemProperty);
+        GrabbableItemScriptable itemScriptable = (GrabbableItemScriptable)itemProperty.boxedValue;
+        UnityEngine.Object prefab = itemScriptable != null ? itemScriptable.Prefab : null;
 
-        int enumIndex = itemTypeProperty.enumValueIndex;
-        string foldoutName = ((Items)(itemTypeProperty.boxedValue)).ToString() + "_Preview";
-
-        SerializedProperty expandedProperty = property.FindPropertyRelative("_expanded");
-        bool expanded = expandedProperty.boolValue;
-
-        expanded = EditorGUILayout.Foldout(expanded, foldoutName);
-        expandedProperty.boolValue = expanded;
-
-        if (expanded)
+        if(itemScriptable != null)
         {
             EditorGUI.indentLevel++;
-
-            EditorGUILayout.PropertyField(itemTypeProperty);
-
-            EditorGUILayout.PropertyField(prefabPropertry);
-
-            SerializedProperty positionProperty = property.FindPropertyRelative("_position");
-            EditorGUILayout.PropertyField(positionProperty);
-
-            SerializedProperty rotationProperty = property.FindPropertyRelative("_rotation");
-            EditorGUILayout.PropertyField(rotationProperty);
-
+            
             bool exampleSpanwed = item.HasExample;
-
             string buttonName = exampleSpanwed ? "End preview." : "See preview.";
-
-            if(prefab != null)
+            
+            if (prefab != null && Application.IsPlaying(prefab))
             {
                 bool buttonPressed = GUILayout.Button(buttonName);
-
+            
                 if (buttonPressed)
                 {
                     if (exampleSpanwed)
@@ -130,28 +147,32 @@ public class PreviewItemDrawer : PropertyDrawer
                         Transform spawnParent = (Transform)(property.serializedObject.FindProperty("_itemsParent").boxedValue);
                         item.SetParent(spawnParent);
                         GameObject spawnedObject = item.SpawnExample();
-
-                        if(spawnedObject != null)
+            
+                        if (spawnedObject != null)
                         {
                             SerializedProperty exampleProperty = property.FindPropertyRelative("_example");
                             exampleProperty.objectReferenceValue = spawnedObject;
                         }
                     }
                 }
-
+            
                 if (exampleSpanwed)
                 {
                     GameObject example = item.Example;
-                    positionProperty.vector3Value = example.transform.localPosition;
-                    rotationProperty.vector3Value = example.transform.localRotation.eulerAngles;
+
+                    if (example != null)
+                    {
+                        itemScriptable.PositionInHolder = example.transform.localPosition;
+                        itemScriptable.RotationInHolder = example.transform.localRotation.eulerAngles;
+                        EditorUtility.SetDirty(itemScriptable);
+                    }
                 }
             }
-
+            
             EditorGUI.indentLevel--;
+            
+            EditorUtility.SetDirty(property.serializedObject.targetObject);
         }
-
-        EditorUtility.SetDirty(property.serializedObject.targetObject);
-        base.OnGUI(position, property, label);
     }
 }
 #endif
