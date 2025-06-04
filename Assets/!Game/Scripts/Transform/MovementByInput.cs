@@ -50,8 +50,10 @@ public class MovementByInput : MonoBehaviour
         if (_inputHandler != null)
         {
             _inputHandler.InputDirectionCallback += (direction) => ManageMovement(direction);
-            _inputHandler.AccelerationButtonPressCallback += (pressed) => Acceleration(pressed);
-            _inputHandler.CrouchButtonPressCallback += (pressed) => Crouching(pressed);
+            _inputHandler.AccelerationButtonPressedCallback += delegate { Acceleration(true); Debug.Log("Ускорение!"); } ;
+            _inputHandler.AccelerationButtonReleasedCallback += delegate { Acceleration(false); };
+            _inputHandler.CrouchButtonPressedCallback += delegate { Crouching(true); };
+            _inputHandler.CrouchButtonReleasedCallback += delegate { Crouching(false); };
         }
     }
 
@@ -62,8 +64,10 @@ public class MovementByInput : MonoBehaviour
         if (_inputHandler != null)
         {
             _inputHandler.InputDirectionCallback -= (direction) => ManageMovement(direction);
-            _inputHandler.AccelerationButtonPressCallback -= (pressed) => Acceleration(pressed);
-            _inputHandler.CrouchButtonPressCallback -= (pressed) => Crouching(pressed);
+            _inputHandler.AccelerationButtonPressedCallback -= delegate { Acceleration(true); };
+            _inputHandler.AccelerationButtonReleasedCallback -= delegate { Acceleration(false); };
+            _inputHandler.CrouchButtonPressedCallback -= delegate { Crouching(true); };
+            _inputHandler.CrouchButtonReleasedCallback -= delegate { Crouching(false); };
         }
 
         if(_speedChangeInterval != null && _speedChangeInterval.Busy)

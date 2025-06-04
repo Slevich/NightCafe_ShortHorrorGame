@@ -16,7 +16,7 @@ TagManager:
   - PostProcess
   - Interactable
   - Player
-  - 
+  - NotWalkable
   - 
   - 
   - 

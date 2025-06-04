@@ -11,11 +11,14 @@ public class CharacterInputHandler : MonoBehaviour
     public Action<Vector2> PointerPositionCallback { get; set; }
     public Action<Vector2> PointerDeltaCallback { get; set; }
 
-    public Action<bool> InteractionButtonPressCallback { get; set; }
-    public Action<bool> AccelerationButtonPressCallback { get; set; }
-    public Action<bool> ApproximationButtonPressCallback { get; set; }
-    public Action<bool> CrouchButtonPressCallback { get; set; }
-    public Action<bool> DropButtonPressCallback { get; set; }
+    public Action InteractionButtonPressedCallback { get; set; }
+    public Action InteractionButtonReleasedCallback { get; set; }
+    public Action AccelerationButtonPressedCallback { get; set; }
+    public Action AccelerationButtonReleasedCallback { get; set; }
+    public Action CrouchButtonPressedCallback { get; set; }
+    public Action CrouchButtonReleasedCallback { get; set; }
+    public Action DropButtonPressedCallback { get; set; }
+    public Action DropButtonReleasedCallback { get; set; }
     #endregion
 
     private void Awake ()
@@ -33,20 +36,42 @@ public class CharacterInputHandler : MonoBehaviour
 
         Vector2 pointerDelta = info.ReturnPointerDelta();
         PointerDeltaCallback?.Invoke(pointerDelta);
-
-        bool interactionButtonPressed = info.InteractionButtonPressed();
-        InteractionButtonPressCallback?.Invoke(interactionButtonPressed);
-
-        bool accelerationButtonPressed = info.AccelerationButtonPressed();
-        AccelerationButtonPressCallback?.Invoke(accelerationButtonPressed);
-
-        bool approximationButtonPressed = info.ApproximationButtonPressed();
-        ApproximationButtonPressCallback?.Invoke(approximationButtonPressed);
-
-        bool crouchButtonPressed = info.CrouchingButtonPressed();
-        CrouchButtonPressCallback?.Invoke(crouchButtonPressed);
-
-        bool dropButtonPressed = info.DropButtonPressed();
-        DropButtonPressCallback?.Invoke(dropButtonPressed);
     }
+
+    private void Subscribe()
+    {
+        KeyboardMouseInfo info = InputHandler.InputInfo;
+
+        info.InteractionButtonPressedCallback += delegate { InteractionButtonPressedCallback?.Invoke(); } ;
+        info.InteractionButtonReleasedCallback += delegate { InteractionButtonReleasedCallback?.Invoke(); } ;
+
+        info.AccelerationButtonPressedCallback += delegate { AccelerationButtonPressedCallback?.Invoke(); };
+        info.AccelerationButtonReleasedCallback += delegate { AccelerationButtonReleasedCallback?.Invoke(); };
+
+        info.CrouchingButtonPressedCallback += delegate { CrouchButtonPressedCallback?.Invoke(); } ;
+        info.CrouchingButtonReleasedCallback += delegate { CrouchButtonReleasedCallback?.Invoke(); };
+
+        info.DropButtonPressedCallback += delegate { DropButtonPressedCallback?.Invoke(); };
+        info.DropButtonReleasedCallback +=  delegate { DropButtonReleasedCallback?.Invoke(); } ;
+    }
+
+    private void Dispose()
+    {
+        KeyboardMouseInfo info = InputHandler.InputInfo;
+
+        info.InteractionButtonPressedCallback -= delegate { InteractionButtonPressedCallback?.Invoke(); };
+        info.InteractionButtonReleasedCallback -= delegate { InteractionButtonReleasedCallback?.Invoke(); };
+
+        info.AccelerationButtonPressedCallback -= delegate { AccelerationButtonPressedCallback?.Invoke(); };
+        info.AccelerationButtonReleasedCallback -= delegate { AccelerationButtonReleasedCallback?.Invoke(); };
+
+        info.CrouchingButtonPressedCallback -= delegate { CrouchButtonPressedCallback?.Invoke(); };
+        info.CrouchingButtonReleasedCallback -= delegate { CrouchButtonReleasedCallback?.Invoke(); };
+
+        info.DropButtonPressedCallback -= delegate { DropButtonPressedCallback?.Invoke(); };
+        info.DropButtonReleasedCallback -= delegate { DropButtonReleasedCallback?.Invoke(); };
+    }
+
+    private void OnEnable () => Subscribe();
+    private void OnDisable () => Dispose();
 }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -19,13 +20,46 @@ public class KeyboardMouseInfo
 
     public Vector2 ReturnPointerDelta () => _characterActions.PointerDelta.ReadValue<Vector2>();
 
-    public bool InteractionButtonPressed () => _characterActions.Interaction.IsInProgress();
+    public Action InteractionButtonPressedCallback { get; set; }
+    public Action InteractionButtonReleasedCallback { get; set; }
 
-    public bool AccelerationButtonPressed () => _characterActions.Acceleration.IsInProgress();
+    public Action AccelerationButtonPressedCallback { get; set; }
+    public Action AccelerationButtonReleasedCallback { get; set; }
 
-    public bool ApproximationButtonPressed () => _characterActions.Approximation.IsInProgress();
+    public Action CrouchingButtonPressedCallback { get; set; }
+    public Action CrouchingButtonReleasedCallback { get; set; }
 
-    public bool CrouchingButtonPressed () => _characterActions.Crouching.IsInProgress();
-    public bool DropButtonPressed() => _characterActions.Drop.IsInProgress();
+    public Action DropButtonPressedCallback { get; set; }
+    public Action DropButtonReleasedCallback { get; set; }
+
+    public void Subscribe()
+    {
+        _characterActions.Interaction.started += delegate { InteractionButtonPressedCallback?.Invoke(); };
+        _characterActions.Interaction.canceled += delegate { InteractionButtonReleasedCallback?.Invoke(); };
+
+        _characterActions.Drop.started += delegate { DropButtonPressedCallback?.Invoke(); };
+        _characterActions.Drop.canceled += delegate { DropButtonReleasedCallback?.Invoke(); };
+
+        _characterActions.Acceleration.started += delegate { AccelerationButtonPressedCallback?.Invoke(); };
+        _characterActions.Acceleration.canceled += delegate { AccelerationButtonReleasedCallback?.Invoke(); };
+
+        _characterActions.Crouching.started += delegate { CrouchingButtonPressedCallback?.Invoke(); };
+        _characterActions.Crouching.canceled += delegate { CrouchingButtonReleasedCallback?.Invoke(); };
+    }
+
+    public void Dispose()
+    {
+        _characterActions.Interaction.started -= delegate { InteractionButtonPressedCallback?.Invoke(); };
+        _characterActions.Interaction.canceled -= delegate { InteractionButtonReleasedCallback?.Invoke(); };
+
+        _characterActions.Drop.started -= delegate { DropButtonPressedCallback?.Invoke(); };
+        _characterActions.Drop.canceled -= delegate { DropButtonReleasedCallback?.Invoke(); };
+
+        _characterActions.Acceleration.started -= delegate { AccelerationButtonPressedCallback?.Invoke(); };
+        _characterActions.Acceleration.canceled -= delegate { AccelerationButtonReleasedCallback?.Invoke(); };
+
+        _characterActions.Crouching.started -= delegate { CrouchingButtonPressedCallback?.Invoke(); };
+        _characterActions.Crouching.canceled -= delegate { CrouchingButtonReleasedCallback?.Invoke(); };
+    }
     #endregion
 }

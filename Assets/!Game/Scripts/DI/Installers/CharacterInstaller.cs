@@ -11,6 +11,8 @@ public class CharacterInstaller : MonoInstaller
     [Header("Items manager."), SerializeField] private ItemsManager _itemsManager;
     [Header("Items grabber."), SerializeField] private ItemGrabber _grabber;
     [Header("Rig weight lerper."), SerializeField] private RigWeightLerper _rigWeightLerper;
+    [Header("Sounds audio player."), SerializeField] private AudioPlayer _audioPlayer;
+    [Header("Interaction manager."), SerializeField] private InteractionManager _interactionManager;
     #endregion
 
     #region Methods
@@ -41,6 +43,15 @@ public class CharacterInstaller : MonoInstaller
             .FromInstance(this._rigWeightLerper)
             .AsSingle();
 
+        this.Container
+            .Bind<AudioPlayer>()
+            .FromInstance(this._audioPlayer)
+            .AsSingle();
+
+        this.Container
+            .Bind<InteractionManager>()
+            .FromInstance(this._interactionManager)
+            .AsSingle();
     }
     #endregion
 }

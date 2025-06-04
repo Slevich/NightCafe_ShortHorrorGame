@@ -39,9 +39,5 @@ public class ActionUpdate : ActionDelayBase
             _busy = false;
             Dispose();
         }
-        else
-        {
-            Debug.LogError("Update didn't started yet!");
-        }
     }
 }

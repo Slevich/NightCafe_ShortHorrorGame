@@ -4,7 +4,10 @@ using UnityEngine;
 
 public interface IInteractable
 {
-    public InteractionType Interaction { get; set; }
+    public bool SomethingInHands (GrabbableItem Item, ItemGrabber Grabber);
+    public void Interact ();
+    public void ResetInteraction ();
+    public bool AlreadyInteracted { get; set; }
+    public string[] ReturnNamesToCheck ();
 
-    public GameObject InteractableObject { get; set; }
 }

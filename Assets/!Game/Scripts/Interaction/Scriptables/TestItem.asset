@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: TestItem
   m_EditorClassIdentifier: 
   <Name>k__BackingField: Test
-  <Prefab>k__BackingField: {fileID: 6752333637614892428, guid: 7ece8256ff53038419d33e357504ae7a,
+  <Prefab>k__BackingField: {fileID: 6821448166360453223, guid: f57bc3bda7fa8694f8869fe378e04f89,
     type: 3}
-  <PositionInHolder>k__BackingField: {x: -0.201, y: -0.2355, z: 0.3501}
-  <RotationInHolder>k__BackingField: {x: 42.404636, y: 339.26163, z: 323.5649}
+  <PositionInHolder>k__BackingField: {x: -0.3062, y: 0.1941, z: 0.1137}
+  <RotationInHolder>k__BackingField: {x: 33.95545, y: -28.6, z: 64.279}

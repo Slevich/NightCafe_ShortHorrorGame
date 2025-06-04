@@ -80,7 +80,6 @@ public class RigWeightLerper : MonoBehaviour
             if(count == totalCount)
             {
                 _lerpInterval.Stop();
-                Debug.Log("Time: " + time);
             }    
         };
 

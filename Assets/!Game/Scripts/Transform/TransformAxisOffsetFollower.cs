@@ -25,7 +25,8 @@ public class TransformAxisOffsetFollower : MonoBehaviour
         _startPosition = transform.position;
         Vector3 targetStartPosition = _followTransform.position;
         _globalOffset = _startPosition - targetStartPosition;
-        _localOffset = _followTransform.parent.InverseTransformDirection(_globalOffset);
+
+        _localOffset = (_followTransform.InverseTransformPoint(_startPosition) - _followTransform.localPosition);
     }
 
     public void StartFollowing()
