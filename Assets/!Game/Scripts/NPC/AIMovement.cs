@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using Game;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -50,6 +49,7 @@ public class AIMovement : MonoBehaviour
         if (_isMoving)
             return;
 
+        _agent.enabled = true;
         _agent.SetDestination(TargetPoint.position);
 
         if (_animator != null)
@@ -76,7 +76,6 @@ public class AIMovement : MonoBehaviour
                 }
 
                 Stop();
-                _agent.SetDestination(_agent.transform.position);
             }
         };
         
@@ -102,6 +101,7 @@ public class AIMovement : MonoBehaviour
         if (_animator != null)
             _animator.SetTrigger(_triggerToIdle);
 
+        _agent.enabled = false;
         _onReachCurrentDestination = null;
         _isMoving = false;
     }

@@ -1,13 +1,7 @@
-using System.Collections;
-using System.Collections.Generic;
-using System.Reflection;
 using UnityEditor;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace Game
-{
     public class EventContainer : MonoBehaviour
     {
         #region Fields and properties
@@ -96,6 +90,7 @@ namespace Game
         #endregion
     }
 
+#if UNITY_EDITOR
     [CustomEditor(typeof(EventContainer))]
     public class EventContainerEditor : Editor
     {
@@ -113,4 +108,4 @@ namespace Game
                 eventContainer.InvokeEventByInvokationType();
         }
     }
-}
+#endif

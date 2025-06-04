@@ -9,8 +9,8 @@ public class LightAnimations : MonoBehaviour
     [Header("Light source."), SerializeField] private Light _light;
     [Header("Base animation duration."), SerializeField] private float _baseDuration = 0.5f;
 
-    private static readonly float _maxRandomIntensity = 10f;
-    private static readonly float _minRandomIntensity = 0f;
+    private static readonly float _maxRandomIntensity = 25f;
+    private static readonly float _minRandomIntensity = 5f;
     private float _startIntensity = 0f;
     private Tween _lightTween;
     #endregion
